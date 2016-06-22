@@ -215,7 +215,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         # Explore neighbors if appropriate
         for node in problem.getSuccessors(curr[0]):
             if node[0] not in visited:
-                hscore = heuristic(curr[0], problem)
+                hscore = heuristic(node[0], problem)
+                #print node[0], hscore
                 new_score = node[2] + cost[curr[0]] + hscore
                 old_score = new_score + 1 # Arbitrary old_score > new_score
                 if node[0] in cost:

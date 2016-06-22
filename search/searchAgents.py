@@ -386,7 +386,9 @@ def cornersHeuristic(state, problem):
     for corner in remaining_corners:
         if corner != closest_corner:
             heuristic = max(abs(closest_corner[0] - corner[0]) + abs(closest_corner[1] - corner[1]), heuristic)
-    heuristic += min_dist
+    
+    if min_dist != None:
+        heuristic += min_dist
 
     return heuristic # Default to trivial solution
 
@@ -482,33 +484,7 @@ def foodHeuristic(state, problem):
     """
     food_list = state[1].asList()
     num_food = len(food_list)
-    walls = problem.walls
-    start= state[0]
-    queue = util.Stack()
-    queue.push(start)
-    closed = []
-    cost = {}
-    cost[start] = 0
-    num_found = 0
-
-    while not queue.isEmpty():
-        curr = queue.pop()
-
-        if curr in food_list:
-            num_found += 1
-
-        if num_found == num_food:
-            return cost[curr] # return BFS distance to farthest food
-
-        successors = [(curr[0] + 1, curr[1]), (curr[0] - 1, curr[1]), (curr[0], curr[1] + 1), (curr[0], curr[1] - 1)]
-        for node in successors:
-            if node[0] >= 0 and node[1] >= 0 and node[0] < walls.width and node[1] < walls.height:
-                if node not in closed and not walls[node[0]][node[1]]:
-                    closed.append(node)
-                    queue.push(node)
-                    cost[node] = 1 + cost[curr]
-
-    return 0
+    return num_food
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
