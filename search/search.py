@@ -86,18 +86,99 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()
+    stack = util.Stack()
+    stack.push((start,))
+    closed = []
+    closed.append(start)
+    predecessor = {}
+
+    while not stack.isEmpty():
+        curr = stack.pop()
+
+        if problem.isGoalState(curr[0]):
+            # path found
+            path = []
+            while curr[0] != start:
+                path.append(curr[1])
+                curr = predecessor[curr]
+            path.reverse()
+            return path
+
+        closed.append(curr[0])
+
+        for node in problem.getSuccessors(curr[0]):
+            if node[0] not in closed:
+                stack.push(node)
+                predecessor[node] = curr
+    return None
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()
+    queue = util.Queue()
+    queue.push((start,))
+    closed = []
+    closed.append(start)
+    predecessor = {}
+
+    while not queue.isEmpty():
+        curr = queue.pop()
+
+        if problem.isGoalState(curr[0]):
+            # path found
+            path = []
+            while curr[0] != start:
+                path.append(curr[1])
+                curr = predecessor[curr]
+            path.reverse()
+            return path
+
+        for node in problem.getSuccessors(curr[0]):
+            if node[0] not in closed:
+                closed.append(node[0])
+                queue.push(node)
+                predecessor[node] = curr
+    return None
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()
+    pqueue = util.PriorityQueue()
+    pqueue.push((start,), 0)
+    visited = []
+    predecessor = {}
+    cost = {}
+    cost[start] = 0
+
+    while not pqueue.isEmpty():
+        curr = pqueue.pop()
+
+        if problem.isGoalState(curr[0]):
+            # path found
+            path = []
+            while curr[0] != start:
+                path.append(curr[1])
+                curr = predecessor[curr]
+            path.reverse()
+            return path
+
+        visited.append(curr[0])
+
+        for node in problem.getSuccessors(curr[0]):
+            if node[0] not in visited:
+                new_cost = node[2] + cost[curr[0]]
+                old_cost = new_cost + 1 # Arbitrary old_cost > new_cost
+                if node[0] in cost:
+                    old_cost = cost[node[0]]
+
+                if old_cost > new_cost:
+                    cost[node[0]] = new_cost
+                    pqueue.push(node, new_cost)
+                    predecessor[node] = curr
+
+    return None
+
 
 def nullHeuristic(state, problem=None):
     """
@@ -108,8 +189,44 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()
+    pqueue = util.PriorityQueue()
+    pqueue.push((start,), 0)
+    visited = []
+    predecessor = {}
+    cost = {}
+    cost[start] = 0
+
+    while not pqueue.isEmpty():
+        curr = pqueue.pop()
+        
+        # Check is node is goal state
+        if problem.isGoalState(curr[0]):
+            # path found
+            path = []
+            while curr[0] != start:
+                path.append(curr[1])
+                curr = predecessor[curr]
+            path.reverse()
+            return path
+
+        visited.append(curr[0])
+
+        # Explore neighbors if appropriate
+        for node in problem.getSuccessors(curr[0]):
+            if node[0] not in visited:
+                hscore = heuristic(curr[0], problem)
+                new_score = node[2] + cost[curr[0]] + hscore
+                old_score = new_score + 1 # Arbitrary old_score > new_score
+                if node[0] in cost:
+                    old_score = cost[node[0]] + hscore
+
+                if old_score > new_score:
+                    cost[node[0]] = node[2] + cost[curr[0]]
+                    pqueue.push(node, new_score)
+                    predecessor[node] = curr
+
+    return None
 
 
 # Abbreviations
